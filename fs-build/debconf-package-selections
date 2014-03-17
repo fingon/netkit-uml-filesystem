@@ -106,7 +106,7 @@ squid	squid/fix_cachedir_perms	boolean	false
 # Enable subpixel rendering for screen:
 # Choices: Automatic, Always, Never
 fontconfig-config	fontconfig/subpixel_rendering	select	Automatic
-# Dummy template
+# Should the Dibbler server be launched when the system starts?
 dibbler-server	dibbler-server/start	boolean	false
 # Dummy template
 # Choices: 
@@ -120,7 +120,7 @@ shorewall-common	shorewall-common/dont_restart	note
 tcpd	tcpd/paranoid-mode	boolean	false
 # Dummy template
 x11-common	x11-common/xwrapper/nice_value	string	0
-# Dummy template
+# Should the Dibbler client be launched when the system starts?
 dibbler-client	dibbler-client/start	boolean	false
 # Dummy template
 # Choices: 
@@ -745,7 +745,7 @@ tzdata	tzdata/Areas	select	Etc
 console-data	console-data/keymap/azerty/belgian/variant	select	
 # Dummy template
 x11-common	x11-common/upgrade_issues	note	
-# Dummy template
+# Interfaces to be configured:
 dibbler-client	dibbler-client/interfaces	string	
 # Dummy template
 dhcp3-client	dhcp3-client/dhclient-script_moved	note	
@@ -777,8 +777,8 @@ console-data	console-data/bootmap-md5sum	string	none
 # Dummy template
 # Choices: 
 console-data	console-data/keymap/qwerty/greek/standard/keymap	select	
-# Dummy template
-# Choices: 
+# Additional parameters to obtain:
+# Choices: dns, domain
 dibbler-client	dibbler-client/options	multiselect	dns, domain
 # Dummy template
 # Choices: 

@@ -25,6 +25,8 @@ debconf
 debian-archive-keyring
 debianutils
 dialog
+dibbler-client
+dibbler-server
 diffutils
 dnsmasq
 dnsutils
