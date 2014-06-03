@@ -121,6 +121,7 @@ smbclient
 smcroute
 snmp
 snmpd
+socat
 squid
 ssl-cert
 ssldump
