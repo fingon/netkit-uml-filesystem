@@ -125,20 +125,6 @@ FS_LABEL=nkfs-$(SUBARCH)-$(NK_FS_RELEASE)
 # subsequent commands use its value as the name of a raw device to write to!!!
 override LOOP_DEV:=$(shell $(LOSETUP) -f)
 
-SECTOR_SIZE=512
-BLOCK_SIZE=1024
-SECTORS_PER_TRACK=63
-PARTITION_OFFSET_BLOCKS=32
-PARTITION_OFFSET_SECTORS:=$(shell expr $(PARTITION_OFFSET_BLOCKS) \* $(BLOCK_SIZE) / $(SECTOR_SIZE))
-PARTITION_OFFSET_BYTES:=$(shell expr $(PARTITION_OFFSET_SECTORS) \* $(SECTOR_SIZE))
-FS_SIZE_BYTES:=$(shell expr $(FS_SIZE) \* 1024 \* 1024)
-FS_SIZE_TRACKS:=$(shell expr $(FS_SIZE_BYTES) / $(SECTORS_PER_TRACK) / $(SECTOR_SIZE))
-ACTUAL_FS_SIZE_BYTES:=$(shell expr $(FS_SIZE_TRACKS) \* $(SECTORS_PER_TRACK) \* $(SECTOR_SIZE) - $(PARTITION_OFFSET_BYTES))
-ACTUAL_FS_SIZE_BLOCKS:=$(shell expr $(ACTUAL_FS_SIZE_BYTES) / $(BLOCK_SIZE))
-
-
-
-
 define UMOUNT_FS
 -$(SUDO_PFX) umount $(FS_MOUNT_DIR)/proc$(SUDO_SFX) >/dev/null 2>&1; true
 -$(SUDO_PFX) umount $(FS_MOUNT_DIR)/proc$(SUDO_SFX) >/dev/null 2>&1; true
@@ -150,14 +136,9 @@ define SETUP_LOOPDEV
 $(SUDO_PFX) $(LOSETUP) $(LOOP_DEV) $(CURDIR)/netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE)$(SUDO_SFX)
 endef
 
-define SETUP_LOOPFS
--$(SUDO_PFX) $(LOSETUP) -d $(LOOP_DEV)$(SUDO_SFX) >/dev/null 2>&1; true
-$(SUDO_PFX) $(LOSETUP) -o $(PARTITION_OFFSET_BYTES) $(LOOP_DEV) $(CURDIR)/netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE)$(SUDO_SFX)
-endef
-
 define MOUNT_FS
 $(UMOUNT_FS)
-$(SETUP_LOOPFS)
+$(SETUP_LOOPDEV)
 mkdir -p $(FS_MOUNT_DIR)
 -$(SUDO_PFX) mount $(LOOP_DEV) $(FS_MOUNT_DIR)$(SUDO_SFX)
 endef
@@ -244,27 +225,17 @@ netkit-fs: .sparsify
 	ln -fs netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE) netkit-fs
 	echo
 	echo "Filesystem size:   $(FS_SIZE) MB"
-	echo "Filesystem offset: $(PARTITION_OFFSET_BYTES) bytes"
 
 .SILENT: netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE)
 netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE):
 	echo -e "\n\e[1m\e[32m========= Creating disk image... =========\e[0m"
 	dd if=/dev/zero of=netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE) count=0 seek=$(FS_SIZE) bs=1M
 
-.SILENT: .partitions_created
-.partitions_created: | netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE)
-	echo -e "\n\e[1m\e[32m====== Creating partition table... =======\e[0m"
-	$(SETUP_LOOPDEV)
-	echo "$(PARTITION_OFFSET_SECTORS),,L,*" | $(SUDO_PFX) sfdisk -q -H 1 -S $(SECTORS_PER_TRACK) -uS -L --no-reread $(LOOP_DEV)$(SUDO_SFX)
-	: > .partitions_created
-
 .SILENT: .fs_created
-.fs_created: .partitions_created
+.fs_created: | netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE)
 	echo -e "\n\e[1m\e[32m========== Creating filesystem... ========\e[0m"
-	$(SETUP_LOOPFS)
-	# Mkfs may overestimate the block count if it is not an integer number;
-	# therefore the block count must be explicitly specified.
-	$(SUDO_PFX) mkfs.ext2 -q -b $(BLOCK_SIZE) $(if $(FS_LABEL),-L $(FS_LABEL),) $(MKFS_FLAGS) $(LOOP_DEV) $(ACTUAL_FS_SIZE_BLOCKS)$(SUDO_SFX)
+	$(SETUP_LOOPDEV)
+	$(SUDO_PFX) mkfs.ext2 -q $(if $(FS_LABEL),-L $(FS_LABEL),) $(MKFS_FLAGS) $(LOOP_DEV) $(SUDO_SFX)
 	$(SUDO_PFX) tune2fs -c 0 -i 0 $(LOOP_DEV)$(SUDO_SFX)
 	: > .fs_created
 
