@@ -124,6 +124,7 @@ ssldump
 strace
 sysv-rc
 sysvinit
+sysvinit-core
 tar
 tcpd
 tcpdump
