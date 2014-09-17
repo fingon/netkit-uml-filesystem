@@ -51,28 +51,14 @@ TOOLS_SRC_DIR=$(FS_BUILD_DIR)/tools-src
 TOOLS_SRC_BUILD_DIR=$(TOOLS_SRC_DIR)/$(TOOLS_SRC_BUILD_DIR_RELATIVE)
 TWEAKS_DIR=$(FS_BUILD_DIR)/netkit-tweaks
 
-# Debian distribution to be installed in the filesystem image
-DEBIAN_VERSION?=wheezy
+include Makefile.config
 
-# Available space in the filesystem image, in MB
-FS_SIZE?=2048
-
-# Additional mkfs flags
-MKFS_FLAGS?=
-
-# Target architecture of the FS image. Valid values include:
-# alpha amd64 arm armel hppa i386 ia64 mips mipsel powerpc s390 sparc
-# However, note that it may not be possible to compile some tools from the
-# source code if no suitable cross-architecture compiler is installed.
-SUBARCH?=amd64
-
-# URL of the Debian mirror to get packages from
-DEBIAN_MIRROR?=http://ftp.fi.debian.org/debian
-
-# Comma separated list of packages to be included in the base system install.
-# This comes handy should the Debian distribution being installed have broken
-# dependencies.
-ADDITIONAL_PACKAGES=debconf-utils,locales
+export $(DEBIAN_VERSION)
+export $(FS_SIZE)
+export $(MKFS_FLAGS)
+export $(SUBARCH)
+export $(DEBIAN_MIRROR)
+export $(ADDITIONAL_PACKAGES)
 
 # Files where downloaded Debian packages should be put
 BASE_PACKAGES_TARBALL_BASENAME=debian-base-packages-$(DEBIAN_VERSION)-$(SUBARCH)
