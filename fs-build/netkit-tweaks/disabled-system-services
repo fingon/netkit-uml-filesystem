@@ -1,13 +1,10 @@
 kbd
 keymap.sh
 hwclock.sh
-console-screen.sh
 checkfs.sh
 setkey
 mountall.sh
 mountall-bootclean.sh
 mountnfs-bootclean.sh
 checkroot-bootclean.sh
-resolvconf
 udev
-udev-mtab
