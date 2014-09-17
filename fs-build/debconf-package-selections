@@ -577,7 +577,7 @@ console-data	console-data/keymap/qwerty/canadian/variant	select
 # Choices: Native, Autohinter, None
 fontconfig-config	fontconfig/hinting_type	select	Native
 # Time zone:
-# Choices: Casey, Davis, Dumont d'Urville, Macquarie, Mawson, McMurdo (South Pole), Palmer, Rothera, Syowa, Vostok
+# Choices: Casey, Davis, DumontDUrville, Macquarie, Mawson, McMurdo, Palmer, Rothera, Syowa, Troll, Vostok
 tzdata	tzdata/Zones/Antarctica	select	
 # Dummy template
 # Choices: 

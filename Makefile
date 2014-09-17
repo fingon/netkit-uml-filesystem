@@ -41,14 +41,11 @@
 
 # The following variables should contain relative paths
 FS_MOUNT_DIR_RELATIVE=mounted_fs
-TOOLS_SRC_BUILD_DIR_RELATIVE=tools-build
 
 
 # The following variables should contain absolute paths
 FS_BUILD_DIR=$(CURDIR)/fs-build
 FS_MOUNT_DIR=$(CURDIR)/$(FS_MOUNT_DIR_RELATIVE)
-TOOLS_SRC_DIR=$(FS_BUILD_DIR)/tools-src
-TOOLS_SRC_BUILD_DIR=$(TOOLS_SRC_DIR)/$(TOOLS_SRC_BUILD_DIR_RELATIVE)
 TWEAKS_DIR=$(FS_BUILD_DIR)/netkit-tweaks
 
 include Makefile.config
@@ -182,10 +179,6 @@ help:
 	@echo "                   while compiling the UML kernel. Possible values"
 	@echo "                   are: alpha amd64 arm armel hppa i386 ia64"
 	@echo "                   mips mipsel powerpc s390 sparc (default: $(SUBARCH))."
-	@echo "                   Note that some installed tools need to be"
-	@echo "                   compiled from source, and compilation may"
-	@echo "                   not be supported for all the above"
-	@echo "                   architectures."
 	@echo
 	@echo "  DEBIAN_MIRROR    The Debian mirror that is used to"
 	@echo "                   retrieve the packages. Use a nearby mirror"
@@ -272,15 +265,8 @@ $(BASE_PACKAGES_TARBALL_BASENAME).tgz:
 	: > .full_system_installed
 
 
-.SILENT: .installed_src_tools
-.installed_src_tools: .full_system_installed
-	echo "\n===== Installing additional tools... ====="
-	#mkdir -p $(TOOLS_SRC_BUILD_DIR)
-	#+$(MAKE) -C $(TOOLS_SRC_BUILD_DIR) -f ../Makefile.devel install-all
-	: > .installed_src_tools
-
 .SILENT: .applied_tweaks
-.applied_tweaks: .installed_src_tools
+.applied_tweaks: .full_system_installed
 	echo "\n=== Applying Netkit-specific tweaks... ==="
 	$(MOUNT_FS)
 	+$(MAKE) -C $(TWEAKS_DIR) -f Makefile.devel netkit-tweaks
@@ -333,11 +319,9 @@ package: ../netkit-filesystem-$(SUBARCH)-$(NK_FS_RELEASE).tar.bz2
 clean:
 	$(CLEAN_MOUNTDIRS)
 	$(CLEAN_LOOPDEVS)
-	-rm -fr $(BUILD_DIR) $(FS_MOUNT_DIR) .partitions_created .fs_created .base_system_installed .full_system_installed .uncompressed_packages .installed_src_tools .applied_tweaks .sparsify netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE) netkit-fs installed-packages-$(SUBARCH)-$(NK_FS_RELEASE) installed-packages build
-	-$(MAKE) -C $(TOOLS_SRC_BUILD_DIR) -f ../Makefile.devel clean
+	-rm -fr $(BUILD_DIR) $(FS_MOUNT_DIR) .partitions_created .fs_created .base_system_installed .full_system_installed .uncompressed_packages .applied_tweaks .sparsify netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE) netkit-fs installed-packages-$(SUBARCH)-$(NK_FS_RELEASE) installed-packages build
 
 .PHONY: clean-all
 clean-all: clean
 	-rm -f debian-*packages*
-	-rm -fr $(TOOLS_SRC_BUILD_DIR)
 

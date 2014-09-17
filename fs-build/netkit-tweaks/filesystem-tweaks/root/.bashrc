@@ -24,13 +24,3 @@ alias grep='grep --color'
 if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
 fi
-
-xorpsh() { 
-   CMDLINE="su xorp -p -c 'xorpsh \"$1\"";
-   while shift; do
-      CMDLINE="$CMDLINE \"$1\"";
-   done;
-   CMDLINE="$CMDLINE'";
-   eval $CMDLINE
-}
-
