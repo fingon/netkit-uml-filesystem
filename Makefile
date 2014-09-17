@@ -168,29 +168,29 @@ default: help
 .PHONY: help
 help:
 	@echo
-	@echo -e "\e[1mAvailable targets are:\e[0m"
+	@echo "Available targets are:"
 	@echo
-	@echo -e "  \e[1mfilesystem\e[0m     Build a Netkit filesystem image from scratch. This"
+	@echo "  filesystem     Build a Netkit filesystem image from scratch. This"
 	@echo "                 procedure requires an Internet connection to retrieve"
 	@echo "                 the required filesystem packages."
 	@echo
-	@echo -e "  \e[1mpackage\e[0m    Create a distributable tarball of the Netkit filesystem."
+	@echo "  package    Create a distributable tarball of the Netkit filesystem."
 	@echo
-	@echo -e "  \e[1mclean\e[0m      Remove files from previous builds."
+	@echo "  clean      Remove files from previous builds."
 	@echo
-	@echo -e "  \e[1mclean-all\e[0m  Also remove downloaded files."
+	@echo "  clean-all  Also remove downloaded files."
 	@echo
-	@echo -e "\e[1mAvailable variables that influence the build process are:"
+	@echo "Available variables that influence the build process are:"
 	@echo
-	@echo -e "  \e[1mDEBIAN_VERSION\e[0m   The name of the Debian distribution to be"
+	@echo "  DEBIAN_VERSION   The name of the Debian distribution to be"
 	@echo "                   installed. Refer to http://www.debian.org/releases/"
 	@echo "                   for the available versions."
 	@echo
-	@echo -e "  \e[1mFS_SIZE\e[0m          The size of the filesystem image to be created"
+	@echo "  FS_SIZE          The size of the filesystem image to be created"
 	@echo "                   (in terms of available space inside the image),"
 	@echo "                   expressed in MB (default: $(FS_SIZE))."
 	@echo
-	@echo -e "  \e[1mSUBARCH\e[0m          Packages inside the filesystem will be"
+	@echo "  SUBARCH          Packages inside the filesystem will be"
 	@echo "                   installed for this architecture. This parameter"
 	@echo "                   may be influenced by the architecture used"
 	@echo "                   while compiling the UML kernel. Possible values"
@@ -201,17 +201,17 @@ help:
 	@echo "                   not be supported for all the above"
 	@echo "                   architectures."
 	@echo
-	@echo -e "  \e[1mDEBIAN_MIRROR\e[0m    The Debian mirror that is used to"
+	@echo "  DEBIAN_MIRROR    The Debian mirror that is used to"
 	@echo "                   retrieve the packages. Use a nearby mirror"
 	@echo "                   (default: $(DEBIAN_MIRROR))."
 	@echo "                   A list of available mirrors is available"
 	@echo "                   at http://www.debian.org/mirror/list."
 	@echo
-	@echo -e "  \e[1mADDITIONAL_PACKAGES\e[0m Additional packages that should be"
+	@echo "  ADDITIONAL_PACKAGES Additional packages that should be"
 	@echo "                   installed early in the build process. The"
 	@echo "                   default set of packages is usually fine."
 	@echo
-	@echo -e "  \e[1mMKFS_FLAGS\e[0m       Additional flags to pass to mkfs."
+	@echo "  MKFS_FLAGS       Additional flags to pass to mkfs."
 	@echo
 
 .PHONY: filesystem
@@ -228,12 +228,12 @@ netkit-fs: .sparsify
 
 .SILENT: netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE)
 netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE):
-	echo -e "\n\e[1m\e[32m========= Creating disk image... =========\e[0m"
+	echo "\n========= Creating disk image... ========="
 	dd if=/dev/zero of=netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE) count=0 seek=$(FS_SIZE) bs=1M
 
 .SILENT: .fs_created
 .fs_created: | netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE)
-	echo -e "\n\e[1m\e[32m========== Creating filesystem... ========\e[0m"
+	echo "\n========== Creating filesystem... ========"
 	$(SETUP_LOOPDEV)
 	$(SUDO_PFX) mkfs.ext2 -q $(if $(FS_LABEL),-L $(FS_LABEL),) $(MKFS_FLAGS) $(LOOP_DEV) $(SUDO_SFX)
 	$(SUDO_PFX) tune2fs -c 0 -i 0 $(LOOP_DEV)$(SUDO_SFX)
@@ -242,20 +242,20 @@ netkit-fs-$(SUBARCH)-$(NK_FS_RELEASE):
 .SILENT: $(BASE_PACKAGES_TARBALL_BASENAME).tgz
 $(BASE_PACKAGES_TARBALL_BASENAME).tgz:
 	mkdir -p $(FS_MOUNT_DIR)
-	echo -e "\n\e[1m\e[33m======= Downloading base packages... =====\e[0m"
+	echo "\n======= Downloading base packages... ====="
 	$(DEBOOTSTRAP) --arch=$(SUBARCH) $(if $(ADDITIONAL_PACKAGES),--include $(ADDITIONAL_PACKAGES),) --make-tarball $(CURDIR)/$(BASE_PACKAGES_TARBALL_TIMESTAMP_BASENAME).tgz $(DEBIAN_VERSION) $(FS_MOUNT_DIR) $(DEBIAN_MIRROR)
 	ln -fs $(BASE_PACKAGES_TARBALL_TIMESTAMP_BASENAME).tgz $(BASE_PACKAGES_TARBALL_BASENAME).tgz
 
 .SILENT: .base_system_installed
 .base_system_installed: $(BASE_PACKAGES_TARBALL_BASENAME).tgz .fs_created
-	echo -e "\n\e[1m\e[32m======= Installing base system... ========\e[0m"
+	echo "\n======= Installing base system... ========"
 	$(MOUNT_FS)
 	$(SUDO_PFX) $(DEBOOTSTRAP) --arch=$(SUBARCH) $(if $(ADDITIONAL_PACKAGES),--include $(ADDITIONAL_PACKAGES),) --unpack-tarball $(CURDIR)/$(BASE_PACKAGES_TARBALL_BASENAME).tgz $(DEBIAN_VERSION) $(FS_MOUNT_DIR) $(DEBIAN_MIRROR)
 	: > .base_system_installed
 
 .SILENT: .full_system_installed
 .full_system_installed: .base_system_installed .uncompressed_packages
-	echo -e "\n\e[1m\e[32m=== Installing additional packages... ====\e[0m"
+	echo "\n=== Installing additional packages... ===="
 	$(MOUNT_FS)
 	-$(SUDO_PFX) chroot $(FS_MOUNT_DIR) mount -t proc none /proc$(SUDO_SFX)
 	# First of all, configure the locale installation
@@ -288,21 +288,21 @@ $(BASE_PACKAGES_TARBALL_BASENAME).tgz:
 
 .SILENT: .installed_src_tools
 .installed_src_tools: .full_system_installed
-	echo -e "\n\e[1m\e[32m===== Installing additional tools... =====\e[0m"
+	echo "\n===== Installing additional tools... ====="
 	#mkdir -p $(TOOLS_SRC_BUILD_DIR)
 	#+$(MAKE) -C $(TOOLS_SRC_BUILD_DIR) -f ../Makefile.devel install-all
 	: > .installed_src_tools
 
 .SILENT: .applied_tweaks
 .applied_tweaks: .installed_src_tools
-	echo -e "\n\e[1m\e[32m=== Applying Netkit-specific tweaks... ===\e[0m"
+	echo "\n=== Applying Netkit-specific tweaks... ==="
 	$(MOUNT_FS)
 	+$(MAKE) -C $(TWEAKS_DIR) -f Makefile.devel netkit-tweaks
 	: > .applied_tweaks
 
 .SILENT: $(PACKAGES_TARBALL_BASENAME).tgz
 $(PACKAGES_TARBALL_BASENAME).tgz: | .base_system_installed
-	echo -e "\n\e[1m\e[33m=== Downloading additional packages... ===\e[0m"
+	echo "\n=== Downloading additional packages... ==="
 	$(MOUNT_FS)
 	$(SUDO_PFX) chroot $(FS_MOUNT_DIR) apt-get update$(SUDO_SFX)
 	for PACKAGE in `cat $(FS_BUILD_DIR)/packages-list`; do echo Downloading $${PACKAGE} and its dependencies...; $(SUDO_PFX) chroot $(FS_MOUNT_DIR) apt-get -fqqy --download-only install $${PACKAGE}$(SUDO_SFX); done
@@ -318,7 +318,7 @@ $(PACKAGES_TARBALL_BASENAME).tgz: | .base_system_installed
 
 .SILENT: .sparsify
 .sparsify: .applied_tweaks
-	echo -e "\n\e[1m\e[32m==== Sparsifying filesystem image... =====\e[0m"
+	echo "\n==== Sparsifying filesystem image... ====="
 	$(MOUNT_FS)
 	-$(SUDO_PFX) dd if=/dev/zero of=$(FS_MOUNT_DIR)/zeros-mass$(SUDO_SFX) >/dev/null 2>&1; true
 	$(SUDO_PFX) rm -f $(FS_MOUNT_DIR)/zeros-mass$(SUDO_SFX)
