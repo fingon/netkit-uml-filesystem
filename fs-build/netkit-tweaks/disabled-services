@@ -13,6 +13,7 @@ isc-dhcp-server
 mrd6
 nfs-common
 nfs-kernel-server
+nmbd
 openbsd-inetd
 openvpn
 pdns-recursor
@@ -27,7 +28,7 @@ rdnssd
 rinetd
 rpcbind
 rsyslog
-samba
+smbd
 smcroute
 snmpd
 snort
