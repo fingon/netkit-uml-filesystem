@@ -39,12 +39,12 @@ KERNEL_VERSION=`uname -r | awk -v FS=- '{print $1}'`
 : ${KERNEL_VERSION:="<unknown>"}
 
 echo "Netkit kernel $NETKIT_KERNEL_VERSION ($KERNEL_VERSION), filesystem $NETKIT_FILESYSTEM_VERSION"
-echo -e "\e[34;1m##################################"
+echo "##################################"
 echo "##                              ##"
 echo "##           NETKIT             ##"
 echo "##                              ##"
-echo -e "##################################\e[0m"
+echo "##################################"
 echo
-echo -e "\e[1mVirtual machine \"$HOSTNAME\" booting up...\e[0m"
+echo "Virtual machine \"$HOSTNAME\" booting up..."
 echo
 
