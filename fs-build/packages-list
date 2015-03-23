@@ -18,7 +18,6 @@ bsdutils
 bzip2
 console-common
 console-data
-console-tools
 coreutils
 cron
 debconf
@@ -90,14 +89,12 @@ nmap
 openssh-client
 openssh-server
 openssl
-openswan
 passwd
 patch
 pdns-recursor
 perl
 perl-base
 perl-modules
-pimd
 portmap
 ppp
 pppoeconf
@@ -121,7 +118,6 @@ smcroute
 snmp
 snmpd
 socat
-squid
 ssl-cert
 ssldump
 strace
