@@ -123,6 +123,8 @@ ssldump
 strace
 sysv-rc
 sysvinit
+sysvinit-core
+sysvinit-utils
 tar
 tcpd
 tcpdump
